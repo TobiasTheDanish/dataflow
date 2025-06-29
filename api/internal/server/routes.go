@@ -26,6 +26,11 @@ func (s *Server) RegisterRoutes() http.Handler {
 	httpGroup.POST("/connect", s.testHttpConnection)
 	httpGroup.POST("/sites", s.createHttpSite)
 
+	ftpGroup := e.Group("/ftp")
+
+	ftpGroup.POST("/connect", s.testFtpConnection)
+	ftpGroup.POST("/sites", s.createFtpSite)
+
 	e.POST("/", s.IndexHandler)
 
 	return e

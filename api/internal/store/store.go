@@ -18,4 +18,5 @@ func New(db *sql.DB) *Store {
 
 type SiteStore interface {
 	CreateHttp(ctx context.Context, data site.NewHttpSite) (res site.HttpSite, err error)
+	CreateFtp(ctx context.Context, data site.NewFtpSite) (res site.FtpSite, err error)
 }

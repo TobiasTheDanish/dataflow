@@ -10,10 +10,7 @@ import (
 )
 
 func (s *Server) testHttpConnection(c echo.Context) error {
-	var config struct {
-		Url     string            `json:"url"`
-		Headers map[string]string `json:"headers"`
-	}
+	var config site.HttpSiteConfig
 	if err := c.Bind(&config); err != nil {
 		slog.Error("Failed to bind http config", "error", err)
 
