@@ -1,27 +1,27 @@
 package server
 
 import (
+	"api/internal/store"
 	"fmt"
 	"net/http"
-	"os"
-	"strconv"
 	"time"
 
 	_ "github.com/joho/godotenv/autoload"
 )
 
 type Config struct {
-	Port int `goenv:"PORT"`
+	Port int `goenv:"PORT,required"`
 }
 
 type Server struct {
-	port int
+	port  int
+	store *store.Store
 }
 
-func NewServer() *http.Server {
-	port, _ := strconv.Atoi(os.Getenv("PORT"))
+func NewServer(config Config, store *store.Store) *http.Server {
 	NewServer := &Server{
-		port: port,
+		port:  config.Port,
+		store: store,
 	}
 
 	// Declare Server config

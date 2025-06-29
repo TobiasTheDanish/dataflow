@@ -1,8 +1,21 @@
 package store
 
+import (
+	"api/internal/store/site"
+	"context"
+	"database/sql"
+)
+
 type Store struct {
+	Sites SiteStore
 }
 
-func New() *Store {
-	return nil
+func New(db *sql.DB) *Store {
+	return &Store{
+		Sites: site.NewStore(db),
+	}
+}
+
+type SiteStore interface {
+	CreateHttp(ctx context.Context, data site.NewHttpSite) (res site.HttpSite, err error)
 }

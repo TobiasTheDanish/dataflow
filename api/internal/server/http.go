@@ -1,6 +1,7 @@
 package server
 
 import (
+	"api/internal/store/site"
 	"io"
 	"log/slog"
 	"net/http"
@@ -46,4 +47,24 @@ func (s *Server) testHttpConnection(c echo.Context) error {
 		"status": res.Status,
 		"body":   string(b),
 	})
+}
+
+func (s *Server) createHttpSite(c echo.Context) error {
+	var httpSiteData site.NewHttpSite
+	if err := c.Bind(&httpSiteData); err != nil {
+		slog.Error("Failed to bind http site data", "error", err)
+		return echo.NewHTTPError(400, err)
+	}
+
+	site, err := s.store.Sites.CreateHttp(c.Request().Context(), httpSiteData)
+	if err != nil {
+		slog.Error("Failed to create http site", "error", err)
+		return echo.NewHTTPError(500, err)
+	}
+
+	res := map[string]any{
+		"site": site,
+	}
+
+	return c.JSON(201, res)
 }

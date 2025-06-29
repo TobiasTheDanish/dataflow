@@ -9,7 +9,11 @@ import (
 	"syscall"
 	"time"
 
+	"api/internal/database"
 	"api/internal/server"
+	"api/internal/store"
+
+	"github.com/anvidev/goenv"
 )
 
 func gracefulShutdown(apiServer *http.Server, done chan bool) {
@@ -38,8 +42,21 @@ func gracefulShutdown(apiServer *http.Server, done chan bool) {
 }
 
 func main() {
+	ctx := context.Background()
 
-	server := server.NewServer()
+	var config Config
+	if err := goenv.Struct(&config); err != nil {
+		panic(fmt.Sprintf("config loading error: %s", err))
+	}
+
+	db, err := database.NewContext(ctx, config.Db)
+	if err != nil {
+		panic(fmt.Sprintf("database initialization error: %s", err))
+	}
+
+	store := store.New(db)
+
+	server := server.NewServer(config.Server, store)
 
 	// Create a done channel to signal when the shutdown is complete
 	done := make(chan bool, 1)
@@ -47,7 +64,7 @@ func main() {
 	// Run graceful shutdown in a separate goroutine
 	go gracefulShutdown(server, done)
 
-	err := server.ListenAndServe()
+	err = server.ListenAndServe()
 	if err != nil && err != http.ErrServerClosed {
 		panic(fmt.Sprintf("http server error: %s", err))
 	}

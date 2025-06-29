@@ -24,6 +24,7 @@ func (s *Server) RegisterRoutes() http.Handler {
 	httpGroup := e.Group("/http")
 
 	httpGroup.POST("/connect", s.testHttpConnection)
+	httpGroup.POST("/sites", s.createHttpSite)
 
 	e.POST("/", s.IndexHandler)
 

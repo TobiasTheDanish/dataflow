@@ -5,6 +5,8 @@ import (
 	"database/sql"
 	"fmt"
 	"time"
+
+	_ "github.com/tursodatabase/libsql-client-go/libsql"
 )
 
 type Config struct {
