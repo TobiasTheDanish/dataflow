@@ -39,22 +39,25 @@
 	/>
 	<label for="authenticationRequired">Require Auth</label>
 </div>
-<div class="grid gap-2">
-	<Label for="username">Username</Label>
-	<Input
-		name="username"
-		disabled={!$form.ftpConfig.authenticationRequired}
-		bind:value={$form.ftpConfig.username}
-		type="text"
-	/>
-</div>
-<div class="grid gap-2">
-	<Label for="password">Password</Label>
-	<Input
-		autocomplete="current-password"
-		name="password"
-		disabled={!$form.ftpConfig.authenticationRequired}
-		bind:value={$form.ftpConfig.password}
-		type="password"
-	/>
-</div>
+
+{#if $form.ftpConfig.authenticationRequired}
+	<div class="grid gap-2">
+		<Label for="username">Username</Label>
+		<Input
+			name="username"
+			disabled={!$form.ftpConfig.authenticationRequired}
+			bind:value={$form.ftpConfig.username}
+			type="text"
+		/>
+	</div>
+	<div class="grid gap-2">
+		<Label for="password">Password</Label>
+		<Input
+			autocomplete="current-password"
+			name="password"
+			disabled={!$form.ftpConfig.authenticationRequired}
+			bind:value={$form.ftpConfig.password}
+			type="password"
+		/>
+	</div>
+{/if}

@@ -56,6 +56,8 @@ func (s *Server) createHttpSite(c echo.Context) error {
 		return echo.NewHTTPError(400, err)
 	}
 
+	slog.Info("Received request", "data", httpSiteData)
+
 	site, err := s.store.Sites.CreateHttp(c.Request().Context(), httpSiteData)
 	if err != nil {
 		slog.Error("Failed to create http site", "error", err)

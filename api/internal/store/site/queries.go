@@ -3,6 +3,7 @@ package site
 import (
 	"context"
 	"encoding/json"
+	"log/slog"
 )
 
 func (s *Store) CreateHttp(ctx context.Context, data NewHttpSite) (res HttpSite, err error) {
@@ -11,7 +12,7 @@ func (s *Store) CreateHttp(ctx context.Context, data NewHttpSite) (res HttpSite,
 
 	stmt := `
 	INSERT INTO df_site (name, conn_type, conn_config)
-	VALUES (?, ?, ?, ?)
+	VALUES (?, ?, ?)
 	RETURNING id
 	`
 
@@ -20,12 +21,14 @@ func (s *Store) CreateHttp(ctx context.Context, data NewHttpSite) (res HttpSite,
 		return
 	}
 
+	slog.Default().Info("Serialized config", "jsonConfig", string(jsonConfig))
+
 	row := s.db.QueryRowContext(
 		ctx,
 		stmt,
 		data.Name,
 		"http",
-		jsonConfig,
+		string(jsonConfig),
 	)
 
 	if err = row.Scan(&res.Id); err != nil {

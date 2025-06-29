@@ -6,8 +6,7 @@
 	import { Input } from '$lib/components/ui/input';
 	import { Button } from '$lib/components/ui/button';
 	import { Separator } from '$lib/components/ui/separator';
-	import FtpConfig from './ftp-config.svelte';
-	import HttpConfig from './http-config.svelte';
+	import CreateSiteDialog from '$lib/components/create-site-dialog.svelte';
 
 	const { data }: PageProps = $props();
 	const { form, enhance } = superForm(data.form, {
@@ -18,28 +17,11 @@
 <form method="POST" class=" m-6 flex h-[90vh] gap-6 rounded-lg border p-6 shadow-sm" use:enhance>
 	<div class="flex w-[350px] flex-col gap-4">
 		<p class="text-xl font-bold">Site information</p>
-		<div class="grid gap-2">
-			<Label for="type">Type</Label>
-			<Select type="single" name="type" bind:value={$form.type}>
-				<SelectTrigger class="uppercase">{$form.type}</SelectTrigger>
-				<SelectContent>
-					<SelectItem value="ftp">FTP</SelectItem>
-					<SelectItem value="http">HTTP</SelectItem>
-				</SelectContent>
-			</Select>
-		</div>
 
-		<div class="grid gap-2">
-			<Label for="address">Address</Label>
-			<Input name="address" bind:value={$form.address} type="text" inputmode="url" />
+		<div class="flex gap-2">
+			<!-- INSERT SITE SELECT HERE -->
+			<CreateSiteDialog />
 		</div>
-		{#if $form.type == 'ftp'}
-			<FtpConfig {form} />
-		{:else if $form.type == 'http'}
-			<HttpConfig {form} />
-		{:else}
-			<p>NOT IMPLEMENTED YET!!</p>
-		{/if}
 	</div>
 
 	<Separator orientation="vertical" />
