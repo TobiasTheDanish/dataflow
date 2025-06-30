@@ -17,6 +17,7 @@ func New(db *sql.DB) *Store {
 }
 
 type SiteStore interface {
+	All(ctx context.Context) ([]site.Site, error)
 	CreateHttp(ctx context.Context, data site.NewHttpSite) (res site.HttpSite, err error)
 	CreateFtp(ctx context.Context, data site.NewFtpSite) (res site.FtpSite, err error)
 }

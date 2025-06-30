@@ -22,7 +22,7 @@ func (s *Server) RegisterRoutes() http.Handler {
 	}))
 
 	sitesGroup := e.Group("/sites")
-	sitesGroup.GET("/", s.getAllSites)
+	sitesGroup.GET("", s.getAllSites)
 
 	httpGroup := sitesGroup.Group("/http")
 	httpGroup.POST("/connect", s.testHttpConnection)

@@ -1,9 +1,10 @@
 package site
 
 type Site struct {
-	Id   int64  `json:"id"`
-	Name string `json:"name"`
-	Type string `json:"type"`
+	Id     int64  `json:"id"`
+	Name   string `json:"name"`
+	Type   string `json:"type"`
+	Config string `json:"config"`
 }
 
 type HttpSite struct {
