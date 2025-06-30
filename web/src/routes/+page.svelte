@@ -12,6 +12,8 @@
 	const { form, enhance } = superForm(data.form, {
 		dataType: 'json'
 	});
+
+	const sites = $derived(data.sites);
 </script>
 
 <form method="POST" class=" m-6 flex h-[90vh] gap-6 rounded-lg border p-6 shadow-sm" use:enhance>
@@ -20,6 +22,24 @@
 
 		<div class="flex gap-2">
 			<!-- INSERT SITE SELECT HERE -->
+			<Select
+				type="single"
+				value={$form.siteId.toString()}
+				onValueChange={(v) => {
+					if (sites.some((site) => site.id == parseInt(v))) {
+						$form.siteId = parseInt(v);
+					}
+				}}
+			>
+				<SelectTrigger>
+					{sites.find((site) => site.id == $form.siteId)?.name ?? 'Select site'}
+				</SelectTrigger>
+				<SelectContent>
+					{#each sites as site (site.id)}
+						<SelectItem value={site.id.toString()}>{site.name}</SelectItem>
+					{/each}
+				</SelectContent>
+			</Select>
 			<CreateSiteDialog />
 		</div>
 	</div>

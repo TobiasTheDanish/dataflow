@@ -1,3 +1,3 @@
-import { API_BASE_URL } from "$env/private/dynamic";
+import { env } from '$env/dynamic/private';
 
-export const baseUrl: string = API_BASE_URL!
+export const baseUrl: string = env.API_BASE_URL!;
