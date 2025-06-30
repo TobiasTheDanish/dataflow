@@ -5,8 +5,6 @@ import (
 	"fmt"
 	"net/http"
 	"time"
-
-	_ "github.com/joho/godotenv/autoload"
 )
 
 type Config struct {

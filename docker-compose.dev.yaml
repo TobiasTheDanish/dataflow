@@ -1,0 +1,35 @@
+services:
+
+  api:
+    container_name: dataflow-api
+    build: 
+      context: ./api/
+      dockerfile: Dockerfile.dev
+    ports:
+      - 8080:8080
+    environment:
+      TURSO_AUTH_URL: ${TURSO_AUTH_URL}
+      TURSO_AUTH_TOKEN: ${TURSO_AUTH_TOKEN}
+      PORT: 8080
+
+    volumes:
+      - ./api/cmd:/app/cmd
+      - ./api/internal:/app/internal
+      - ./api/go.mod:/app/go.mod
+      - ./api/go.sum:/app/go.sum
+      - ./api/.air.toml:/app/.air.toml
+      - ./api/tmp:/app/tmp
+
+  web: 
+    container_name: dataflow-web
+    build: 
+      context: ./web
+      dockerfile: Dockerfile.dev
+    ports:
+      - 5173:5173
+    environment:
+      API_BASE_URL: "http://api:8080"
+    volumes:
+      - ./web/.svelte-kit:/app/.svelte-kit
+      - ./web/src:/app/src
+      - ./web/static:/app/static
