@@ -21,15 +21,16 @@ func (s *Server) RegisterRoutes() http.Handler {
 		MaxAge:           300,
 	}))
 
-	httpGroup := e.Group("/http")
+	sitesGroup := e.Group("/sites")
+	sitesGroup.GET("/", s.getAllSites)
 
+	httpGroup := sitesGroup.Group("/http")
 	httpGroup.POST("/connect", s.testHttpConnection)
-	httpGroup.POST("/sites", s.createHttpSite)
+	httpGroup.POST("/", s.createHttpSite)
 
-	ftpGroup := e.Group("/ftp")
-
+	ftpGroup := sitesGroup.Group("/ftp")
 	ftpGroup.POST("/connect", s.testFtpConnection)
-	ftpGroup.POST("/sites", s.createFtpSite)
+	ftpGroup.POST("/", s.createFtpSite)
 
 	e.POST("/", s.IndexHandler)
 
