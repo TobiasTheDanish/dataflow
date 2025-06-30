@@ -64,7 +64,7 @@ export const load: PageServerLoad = async () => {
 };
 
 export const actions: Actions = {
-	testConnection: async ({ request, fetch }) => {
+	testConnection: async ({ request, locals }) => {
 		const form = await superValidate(request, zod(siteSchema));
 		if (!form.valid) {
 			return fail(400, form);
@@ -74,48 +74,35 @@ export const actions: Actions = {
 
 		const config = form.data.type == 'http' ? form.data.httpConfig : form.data.ftpConfig;
 
-		const res = await fetch(`http://localhost:8080/${form.data.type}/connect`, {
-			method: 'post',
-			headers: {
-				'content-type': 'application/json'
-			},
-			body: JSON.stringify({
-				...config,
-				url: form.data.address
-			})
+		const res = await locals.apiService.testSiteConnection(form.data.type, {
+			url: form.data.address,
+			config
 		});
 
-		const response = await res.text();
-		console.log(response);
+		if (res.ok) {
+			console.log(res.data);
 
-		return message(form, response);
+			return message(form, res.data);
+		}
+
+		return fail(res.status ?? 500, form);
 	},
-	create: async ({ request, fetch }) => {
+	create: async ({ request, locals }) => {
 		const form = await superValidate(request, zod(siteSchema));
 		if (!form.valid) {
 			return fail(400, form);
 		}
 
-		console.log(form.data);
-
 		const config = form.data.type == 'http' ? form.data.httpConfig : form.data.ftpConfig;
 
-		const res = await fetch(`http://localhost:8080/${form.data.type}/sites`, {
-			method: 'post',
-			headers: {
-				'content-type': 'application/json'
-			},
-			body: JSON.stringify({
-				name: form.data.name,
-				config: {
-					...config,
-					url: form.data.address
-				}
-			})
+		const res = await locals.apiService.createSite(form.data.type, {
+			name: form.data.name,
+			url: form.data.address,
+			config
 		});
 
 		if (!res.ok) {
-			return fail(res.status, form);
+			return fail(res.status ?? 500, form);
 		}
 
 		return message(form, 'Site created');
