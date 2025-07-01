@@ -20,8 +20,7 @@
 	<div class="flex w-[350px] flex-col gap-4">
 		<p class="text-xl font-bold">Site information</p>
 
-		<div class="flex gap-2">
-			<!-- INSERT SITE SELECT HERE -->
+		<div class="grid grid-cols-[1fr_2.25rem] gap-2">
 			<Select
 				type="single"
 				value={$form.siteId.toString()}
@@ -31,7 +30,7 @@
 					}
 				}}
 			>
-				<SelectTrigger>
+				<SelectTrigger class="w-full">
 					{sites.find((site) => site.id == $form.siteId)?.name ?? 'Select site'}
 				</SelectTrigger>
 				<SelectContent>

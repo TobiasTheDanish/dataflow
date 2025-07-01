@@ -42,7 +42,7 @@ export const ApiServiceFactory = (fetch: FetchFn) => ({
 		type: SiteConnectionType,
 		data: TestConnectionData
 	): Promise<ServiceResponse> {
-		const res = await fetch(`${baseUrl}/${type}/connect`, {
+		const res = await fetch(`${baseUrl}/sites/${type}/connect`, {
 			method: 'post',
 			headers: {
 				'content-type': 'application/json'
@@ -70,7 +70,7 @@ export const ApiServiceFactory = (fetch: FetchFn) => ({
 		type: SiteConnectionType,
 		data: CreateSiteData
 	): Promise<ServiceResponse> {
-		const res = await fetch(`${baseUrl}/${type}/sites`, {
+		const res = await fetch(`${baseUrl}/sites/${type}`, {
 			method: 'post',
 			headers: {
 				'content-type': 'application/json'

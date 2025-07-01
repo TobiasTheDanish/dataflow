@@ -36,7 +36,7 @@ func (s *Server) testFtpConnection(c echo.Context) error {
 	}
 
 	// Maybe we can do something to test the connection more
-	_, err = conn.List(".")
+	entries, err := conn.List(".")
 	if err != nil {
 		slog.Error("Failed to issue LIST command to ftp server", "connectionStr", connStr, "error", err)
 		return echo.NewHTTPError(400, err)
@@ -48,7 +48,8 @@ func (s *Server) testFtpConnection(c echo.Context) error {
 	}
 
 	return c.JSON(201, map[string]any{
-		"status": "success",
+		"status":  "success",
+		"entries": entries,
 	})
 }
 

@@ -34,6 +34,8 @@ func (s *Server) testHttpConnection(c echo.Context) error {
 	}
 	defer res.Body.Close()
 
+	contentType := res.Header.Get("Content-Type")
+
 	b, err := io.ReadAll(res.Body)
 	if err != nil {
 		slog.Error("Failed to read request body", "error", err)
@@ -41,8 +43,9 @@ func (s *Server) testHttpConnection(c echo.Context) error {
 	}
 
 	return c.JSON(201, map[string]any{
-		"status": res.Status,
-		"body":   string(b),
+		"status":      res.StatusCode,
+		"contentType": contentType,
+		"body":        string(b),
 	})
 }
 

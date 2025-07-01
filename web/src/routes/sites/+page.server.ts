@@ -67,7 +67,7 @@ export const actions: Actions = {
 	testConnection: async ({ request, locals }) => {
 		const form = await superValidate(request, zod(siteSchema));
 		if (!form.valid) {
-			return fail(400, form);
+			return fail(400, { form });
 		}
 
 		console.log(form.data);
@@ -80,17 +80,15 @@ export const actions: Actions = {
 		});
 
 		if (res.ok) {
-			console.log(res.data);
-
 			return message(form, res.data);
 		}
 
-		return fail(res.status ?? 500, form);
+		return message(form, { status: res.status, error: JSON.parse(res.error) });
 	},
 	create: async ({ request, locals }) => {
 		const form = await superValidate(request, zod(siteSchema));
 		if (!form.valid) {
-			return fail(400, form);
+			return fail(400, { form });
 		}
 
 		const config = form.data.type == 'http' ? form.data.httpConfig : form.data.ftpConfig;
@@ -102,7 +100,7 @@ export const actions: Actions = {
 		});
 
 		if (!res.ok) {
-			return fail(res.status ?? 500, form);
+			return fail(res.status ?? 500, { form });
 		}
 
 		return message(form, 'Site created');
