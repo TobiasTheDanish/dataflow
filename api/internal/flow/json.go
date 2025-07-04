@@ -7,27 +7,6 @@ import (
 	"net/http"
 )
 
-type JsonToHttpStep struct {
-	next      Step
-	processor JsonToHttpProcessor
-	input     Input
-}
-
-func (s *JsonToHttpStep) Next() Step { return s.next }
-func (s *JsonToHttpStep) Start() error {
-	out := s.processor.Process(s.input)
-	if out.HasError() {
-		return out.Error()
-	}
-
-	if s.Next() != nil {
-		s.Next().SetInput(out)
-	}
-
-	return nil
-}
-func (s *JsonToHttpStep) SetInput(in Input) { s.input = in }
-
 type JsonData struct {
 	data map[string]any
 	keys []string
@@ -55,14 +34,16 @@ type JsonInput struct {
 	parsedData map[string]any
 }
 
-func (i *JsonInput) Data() map[string]any {
+func (i *JsonInput) Data() Data {
 	if i.parsedData == nil {
 		if err := json.Unmarshal(i.rawData, &i.parsedData); err != nil {
 			panic(err)
 		}
 	}
 
-	return i.parsedData
+	return &JsonData{
+		data: i.parsedData,
+	}
 }
 func (i *JsonInput) HasError() bool { return false }
 func (i *JsonInput) Error() error   { return nil }
@@ -76,7 +57,7 @@ type JsonToHttpProcessor struct {
 func (p *JsonToHttpProcessor) Process(input Input) Output {
 	var req *http.Request
 	data := input.Data().Data()
-	if data == nil {
+	if data != nil {
 		body, err := json.Marshal(data)
 		if err != nil {
 			return &ErrorOutput{err}
@@ -106,12 +87,13 @@ func (p *JsonToHttpProcessor) Process(input Input) Output {
 	if res.StatusCode == 200 || res.StatusCode == 201 {
 		// Success with potential body
 		body, err := io.ReadAll(res.Body)
+		defer res.Body.Close()
 		if err != nil {
 			return &ErrorOutput{err}
 		}
 
 		return &HttpOutput{
-			data: HttpData{
+			data: HttpResponseData{
 				Ok:          true,
 				StatusCode:  res.StatusCode,
 				ContentType: res.Header.Get("Content-Type"),
@@ -120,7 +102,7 @@ func (p *JsonToHttpProcessor) Process(input Input) Output {
 		}
 	} else if res.StatusCode == 202 || res.StatusCode == 204 {
 		return &HttpOutput{
-			data: HttpData{
+			data: HttpResponseData{
 				Ok:          true,
 				StatusCode:  res.StatusCode,
 				ContentType: res.Header.Get("Content-Type"),
@@ -129,12 +111,13 @@ func (p *JsonToHttpProcessor) Process(input Input) Output {
 		}
 	} else {
 		body, err := io.ReadAll(res.Body)
+		defer res.Body.Close()
 		if err != nil {
 			return &ErrorOutput{err}
 		}
 
 		return &HttpOutput{
-			data: HttpData{
+			data: HttpResponseData{
 				Ok:          false,
 				StatusCode:  res.StatusCode,
 				ContentType: res.Header.Get("Content-Type"),

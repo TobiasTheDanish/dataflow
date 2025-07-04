@@ -54,7 +54,7 @@ func (s *Server) IndexHandler(c echo.Context) error {
 		return echo.NewHTTPError(http.StatusBadRequest, err)
 	}
 
-	slog.Info("Received data", data)
+	slog.Info("Received", "data", data)
 
 	resp := map[string]string{
 		"message": "Hello World",
