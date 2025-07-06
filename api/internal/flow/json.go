@@ -3,6 +3,7 @@ package flow
 import (
 	"bytes"
 	"encoding/json"
+	"fmt"
 	"io"
 	"net/http"
 )
@@ -124,5 +125,30 @@ func (p *JsonToHttpProcessor) Process(input Input) Output {
 				Body:        string(body),
 			},
 		}
+	}
+}
+
+type JsonToJsonProcessor struct {
+	keyMappings map[string]string
+}
+
+func (p *JsonToJsonProcessor) Process(input Input) Output {
+	if in, ok := input.(*JsonInput); ok {
+		data := in.Data()
+		if data.DataFormat() != JSON {
+			return &ErrorOutput{err: fmt.Errorf("Expected JSON data as input")}
+		}
+
+		inputDataMap := data.Data()
+		outputDataMap := make(map[string]any)
+		for inKey, outKey := range p.keyMappings {
+			outputDataMap[outKey] = inputDataMap[inKey]
+		}
+
+		return &JsonInput{
+			parsedData: outputDataMap,
+		}
+	} else {
+		return &ErrorOutput{err: fmt.Errorf("Expected JSON input")}
 	}
 }
