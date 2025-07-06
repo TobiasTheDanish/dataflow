@@ -1,17 +1,23 @@
 package flow
 
 type StepConfig struct {
-	InputType        OutputType
-	InputDataFormat  DataFormat
-	OutputType       OutputType
-	OutputDataFormat DataFormat
-	HttpConfig       HttpStepConfig
+	Name                 string
+	InputType            OutputType
+	InputDataFormat      DataFormat
+	OutputType           OutputType
+	OutputDataFormat     DataFormat
+	HttpConfig           HttpStepConfig
+	DataProcessingConfig DataProcessingStepConfig
 }
 
 type HttpStepConfig struct {
 	method  string
 	apiUrl  string
 	headers map[string]string
+}
+
+type DataProcessingStepConfig struct {
+	keyMappings map[string]string
 }
 
 type FlowBuilder struct {
@@ -63,6 +69,7 @@ func appendHttpInputToDataStep(fb *FlowBuilder, config StepConfig) {
 	switch config.OutputDataFormat {
 	case JSON:
 		s := &step{
+			name: config.Name,
 			processor: &HttpToJsonProcessor{
 				apiUrl:  config.HttpConfig.apiUrl,
 				method:  config.HttpConfig.method,
@@ -80,7 +87,14 @@ func appendJsonInputStep(fb *FlowBuilder, config StepConfig) {
 		appendJsonInputToHttpStep(fb, config)
 		break
 	case DATA:
-		panic("DATA OUTPUT TYPE NOT IMPLEMENTED YET")
+		switch config.OutputDataFormat {
+		case JSON:
+			appendJsonToJsonStep(fb, config)
+			break
+		case CSV:
+			panic("CSV DATA FORMAT NOT IMPLEMENTED YET")
+		}
+
 	}
 }
 
@@ -88,6 +102,7 @@ func appendJsonInputToHttpStep(fb *FlowBuilder, config StepConfig) {
 	switch config.OutputDataFormat {
 	case JSON:
 		s := &step{
+			name: config.Name,
 			processor: &JsonToHttpProcessor{
 				apiUrl:  config.HttpConfig.apiUrl,
 				method:  config.HttpConfig.method,
@@ -97,6 +112,16 @@ func appendJsonInputToHttpStep(fb *FlowBuilder, config StepConfig) {
 		appendStep(fb, s)
 		break
 	}
+}
+
+func appendJsonToJsonStep(fb *FlowBuilder, config StepConfig) {
+	s := &step{
+		name: config.Name,
+		processor: &JsonToJsonProcessor{
+			keyMappings: config.DataProcessingConfig.keyMappings,
+		},
+	}
+	appendStep(fb, s)
 }
 
 func appendStep(fb *FlowBuilder, step Step) {

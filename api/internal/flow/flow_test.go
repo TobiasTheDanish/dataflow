@@ -12,6 +12,7 @@ func TestMain(m *testing.M) {
 func TestFlowBuilder(t *testing.T) {
 	steps := []StepConfig{
 		{
+			Name:             "Data fetching",
 			InputType:        HTTP,
 			InputDataFormat:  JSON,
 			OutputType:       DATA,
@@ -23,6 +24,21 @@ func TestFlowBuilder(t *testing.T) {
 			},
 		},
 		{
+			Name:             "Data processing",
+			InputType:        DATA,
+			InputDataFormat:  JSON,
+			OutputType:       DATA,
+			OutputDataFormat: JSON,
+			DataProcessingConfig: DataProcessingStepConfig{
+				keyMappings: map[string]string{
+					"body":   "body",
+					"title":  "title",
+					"userId": "userId",
+				},
+			},
+		},
+		{
+			Name:             "Data posting",
 			OutputType:       HTTP,
 			OutputDataFormat: JSON,
 			InputType:        DATA,
