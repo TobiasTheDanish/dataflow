@@ -25,7 +25,7 @@ func (p *HttpToJsonProcessor) Process(input Input) Output {
 				{
 					body, err := json.Marshal(data.Data())
 					if err != nil {
-						return &ErrorOutput{err}
+						return &ErrorOutput{fmt.Errorf("Error marshalling request body: %v", err)}
 					}
 					bodyReader = bytes.NewReader(body)
 					break
@@ -60,15 +60,15 @@ func (p *HttpToJsonProcessor) Process(input Input) Output {
 
 		// Success with potential body
 		body, err := io.ReadAll(res.Body)
-		defer res.Body.Close()
 		if err != nil {
 			return &ErrorOutput{err}
 		}
+		defer res.Body.Close()
 
 		var jsonBody map[string]any
 		err = json.Unmarshal(body, &jsonBody)
 		if err != nil {
-			return &ErrorOutput{err}
+			return &ErrorOutput{err: fmt.Errorf("Unable to unmarshal response body: %v", err)}
 		}
 
 		return &JsonInput{
